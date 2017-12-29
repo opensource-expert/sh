@@ -538,7 +538,7 @@ var fileCases = []struct {
 		"exit status 1 #JUSTERR",
 	},
 	{
-		"[[ $PWD == $(pwd) ]]",
+		"echo $PWD $(pwd); [[ $PWD == $(pwd) ]]",
 		"",
 	},
 	{
@@ -554,11 +554,7 @@ var fileCases = []struct {
 		"%s\n",
 	},
 	{
-		"echo ${PWD:0:1}",
-		"/\n",
-	},
-	{
-		`old="$PWD"; mkdir a; cd a; cd ..; [[ $old == $PWD ]]`,
+		`old="$PWD"; mkdir a; cd a; cd ..; echo $old; echo $PWD; [[ $old == $PWD ]]`,
 		"",
 	},
 	{
@@ -566,7 +562,7 @@ var fileCases = []struct {
 		"exit status 1",
 	},
 	{
-		`old="$PWD"; mkdir a; cd a; [[ $old == $OLDPWD ]]`,
+		`old="$PWD"; mkdir a; cd a; echo $old $OLDPWD; [[ $old == $OLDPWD ]]`,
 		"",
 	},
 	{
@@ -2039,11 +2035,8 @@ var skipOnDarwin = regexp.MustCompile(`\bwc\b|touch -d @`)
 // ln -s: requires linked path to exist, stat does not work well
 // \\\\: TODO
 // /: TODO
-// PATH=: TODO
-// PWD: TODO
 // ${!: TODO
-// ~: TODO
-var skipOnWindows = regexp.MustCompile(`\b(chmod|mkfifo|ln -s)\b|\\\\|/|PATH=|PWD|\${!|~`)
+var skipOnWindows = regexp.MustCompile(`\b(chmod|mkfifo|ln -s)\b|\\\\|/|\${!`)
 
 func skipFileReason(src string) string {
 	if runtime.GOOS == "darwin" && skipOnDarwin.MatchString(src) {
